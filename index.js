@@ -18,6 +18,7 @@ async function run() {
     try {
         await client.connect();
         const bicycleCollection = client.db('bicycle').collection('service');
+        const myItemsCollection = client.db('bicycle').collection
 
         app.get('/products', async (req, res) => {
             const query = {};
@@ -40,8 +41,7 @@ async function run() {
         // post item
 
         app.post('/products', async(req, res) => {
-            const newProduct = req.body;
-            console.log(newProduct);
+            const newProduct = req.body;          
             const result = await bicycleCollection.insertOne(newProduct);
             res.send(result);
         })
@@ -55,6 +55,21 @@ async function run() {
 
 
         })
+
+        // update quantity
+        app.put('/quantity/:id', async (req, res) => {
+            const id = req.params.id;
+            const product = req.body;
+            const filter = {_id: ObjectId(id)};
+            const options = { upsert: true};
+            console.log(product);
+             const updateDoc = {
+                $set: {quantity: product.quantity}
+            };
+            const result = await bicycleCollection.updateOne(filter, updateDoc, options);
+            res.send(result); 
+        })
+      
 
 
     }
